@@ -1,11 +1,5 @@
 package com.raion.weekly_workshop_6th.di
 
-import com.raion.weekly_workshop_6th.data.local.TokenStorage
-import com.raion.weekly_workshop_6th.data.remote.AuthInterceptor
-import com.raion.weekly_workshop_6th.data.repository.AuthRepositoryImpl
-import com.raion.weekly_workshop_6th.data.repository.NoteRepositoryImpl
-import com.raion.weekly_workshop_6th.domain.repository.AuthRepository
-import com.raion.weekly_workshop_6th.domain.repository.NoteRepository
 import com.raion.weekly_workshop_6th.presentation.features.auth.login.LoginViewModel
 import com.raion.weekly_workshop_6th.presentation.features.auth.register.RegisterViewModel
 import com.raion.weekly_workshop_6th.presentation.features.note.detail.NoteDetailViewModel
@@ -24,48 +18,9 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    single { TokenStorage(get()) }
+    // token storage
 
-    single {
-        val tokenStorage: TokenStorage = get()
-
-
-        HttpClient(Android) {
-            install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                    prettyPrint = true
-                })
-            }
-
-            // Log both request and response bodies
-            install(Logging) { level = LogLevel.BODY }
-
-            // Install your custom interceptor for Authorization header + optional refresh logic
-            install(AuthInterceptor(tokenStorage))
-
-            expectSuccess = false
-
-            // Default configuration for all requests
-            defaultRequest {
-
-                // Add only static jwt configuration here
-//                val token = tokenStorage.getToken()
-//                if (!token.isNullOrBlank()) {
-//                    header("Authorization", token)
-//                }
-
-                // base url
-                // default : https://notes.elginbrian.com/api/
-                url {
-                    protocol = URLProtocol.HTTPS
-                    host = "notes.elginbrian.com"
-                }
-            }
-        }
-    }
-
+    // ktor client
 
     // provide repositories
     single<AuthRepository> { AuthRepositoryImpl(get()) }
